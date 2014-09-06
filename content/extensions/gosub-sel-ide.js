@@ -2,9 +2,9 @@
  * gosub-sel-ide.js
  * A gosub control plugin for Selenium-IDE
  * Copyright 2014-, Aoki Makoto, Ninton G.K. http://www.ninton.co.jp
- * Released under the MIT license - http://en.wikipedia.org/wiki/MIT_License
+ * Released under the Mozilla Public License - https://www.mozilla.org/MPL/
  * 
- * It referred to Selenium IDE: Flow Control 
+ * It referred to Selenium IDE: Flow Control
  */
 function GosubControlClass() {
 	this.labels = {};

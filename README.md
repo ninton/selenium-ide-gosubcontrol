@@ -2,6 +2,10 @@
 
 Adds gosub control to Selenium IDE.
 
+## Lincense
+
+Mozilla Public License - https://www.mozilla.org/MPL/
+
 ## Requirements
 
 * Selenium IDE 1.0.5 or later
