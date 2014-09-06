@@ -19,7 +19,7 @@ To build on Windows you will need 7-Zip and Robocopy:
 
 From AMO:
 
-* Open https://addons.mozilla.org/en-US/firefox/addon/gosub-control
+* Open https://addons.mozilla.org/ja/firefox/addon/selenium-ide-gosub-control/
 * Click 'Add to Firefox'
 
 From source:
