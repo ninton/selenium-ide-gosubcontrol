@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head profile="http://selenium-ide.openqa.org/profiles/test-case">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<link rel="selenium.base" href="http://localhost/" />
+<title>sample_testcase</title>
+</head>
+<body>
+<table cellpadding="1" cellspacing="1" border="1">
+<thead>
+<tr><td rowspan="1" colspan="3">gosub_sample1</td></tr>
+</thead><tbody>
+<tr>
+	<td>store</td>
+	<td>0</td>
+	<td>X</td>
+</tr>
+<!--# x_add_1 x 3-->
+<tr>
+	<td>gosub</td>
+	<td>x_add_1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>gosub</td>
+	<td>x_add_1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>gosub</td>
+	<td>x_add_1</td>
+	<td></td>
+</tr>
+<!--# verify( x == 3 )-->
+<tr>
+	<td>verifyExpression</td>
+	<td>${X}</td>
+	<td>3</td>
+</tr>
+<!--#-->
+<tr>
+	<td>sub</td>
+	<td>x_add_1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>storeEval</td>
+	<td>parseInt(${X})+1</td>
+	<td>X</td>
+</tr>
+<tr>
+	<td>echo</td>
+	<td>${X}</td>
+	<td></td>
+</tr>
+<tr>
+	<td>endsub</td>
+	<td></td>
+	<td></td>
+</tr>
+<!--# not from gosub,-->
+<!--# when the step down has been carried out from the upper line,-->
+<!--# it skips to endsub from sub. -->
+<tr>
+	<td>verifyExpression</td>
+	<td>${X}</td>
+	<td>3</td>
+</tr>
+</tbody></table>
+</body>
+</html>

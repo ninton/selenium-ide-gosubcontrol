@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<RDF xmlns="http://www.w3.org/1999/02/22-rdf-syntax-ns#" 
+ xmlns:em="http://www.mozilla.org/2004/em-rdf#">
+  <Description about="urn:mozilla:install-manifest">
+    <em:id>gosubcontrol@ninton.co.jp</em:id>
+    <em:name>Selenium IDE: Gosub Control</em:name>
+    <em:version>1.0</em:version>
+    <em:creator>Aoki Makoto, Ninton G.K.</em:creator>
+    <em:description>A gosub control plugin for Selenium-IDE</em:description>
+    <em:type>2</em:type> <!--Type extension-->
+    
+    <em:targetApplication>
+      <Description>
+        <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id> <!-- firefox -->
+        <em:minVersion>1.5</em:minVersion>
+        <em:maxVersion>9.*</em:maxVersion>
+      </Description>
+    </em:targetApplication>
+    
+    <em:requires>   
+     <Description>
+         <em:id>{a6fd85ed-e919-4a43-a5af-8da18bda539f}</em:id>
+         <em:minVersion>1.0.5</em:minVersion>
+         <em:maxVersion>1.*</em:maxVersion>
+     </Description>  
+    </em:requires>
+
+		<em:localized>
+			<Description>
+				<em:locale>en-US</em:locale>
+				<em:creator>Aoki Makoto, Ninton G.K.</em:creator>
+				<em:name>Selenium IDE: Gosub Control</em:name>
+				<em:description>A gosub control plugin for Selenium-IDE
+
+A BASIC-like command is added - gosub, sub, endsub, return
+
+gosub myfunc1
+gosub myfunc2
+#
+sub myfunc1
+echo myfunc1
+endsub
+#
+sub myfunc2
+echo myfunc2
+endsub
+</em:description>
+				<em:homepageURL>https://github.com/ninton/selenium-ide-gosubcontrol</em:homepageURL>
+			</Description>
+		</em:localized>
+		<em:localized>
+			<Description>
+				<em:locale>ja</em:locale>
+				<em:creator>Aoki Makoto, Ninton G.K.</em:creator>
+				<em:name>Selenium IDE: Gosub Control</em:name>
+				<em:description>A gosub control plugin for Selenium-IDE
+
+BASICライクなコマンドを追加します - gosub, sub endsub, return
+
+gosub myfunc1
+gosub myfunc2
+#
+sub myfunc1
+echo myfunc1
+endsub
+#
+sub myfunc2
+echo myfunc2
+endsub
+
+</em:description>
+				<em:homepageURL>https://github.com/ninton/selenium-ide-gosubcontrol</em:homepageURL>
+			</Description>
+		</em:localized
+  </Description>
+</RDF>
