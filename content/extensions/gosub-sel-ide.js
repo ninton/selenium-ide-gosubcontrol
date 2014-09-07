@@ -11,6 +11,18 @@ function GosubControlClass() {
 	this.stack    = [];
 	this.init_err = null;
 	
+	this.initOnce = function ( io_selenium ) {
+		// issue #2: If "Flow Control" is installed, this cannot be initialized correctly
+		// [MEMO] htmlTestRunner.metrics.startTime is undefined.
+		// [MEMO] testCase.lastModifiedTime is same as testCase.file.lastModifiedTime.
+		if ( typeof io_selenium.gosub_initialized != 'undefined' ) {
+			return;
+		}
+		
+		this.init();
+		io_selenium.gosub_initialized = true;
+	};
+	
 	this.init = function () {
 		this.echo( 'gosubInit' );
 		
@@ -146,36 +158,32 @@ function GosubControlClass() {
 
 var GosubControl = new GosubControlClass();
 
-Selenium.prototype.reset = function() {
-	//overload the original Selenium reset function
-	this.doGosubInit();
-	
-    // proceed with original reset code
-    this.defaultTimeout = Selenium.DEFAULT_TIMEOUT;
-    this.browserbot.selectWindow("null");
-    this.browserbot.resetPopups();
-}
 
 Selenium.prototype.doGosubInit = function() {
 	GosubControl.init();
 }
 
 Selenium.prototype.doGosubDebug = function() {
+	GosubControl.initOnce(this);
 	GosubControl.debug();
 }
 
 Selenium.prototype.doGosub = function( i_label ) {
+	GosubControl.initOnce(this);
 	GosubControl.doGosub( i_label );
 }
 
 Selenium.prototype.doSub = function( i_label ) {
+	GosubControl.initOnce(this);
 	GosubControl.doSub( i_label );
 }
 
 Selenium.prototype.doEndsub = function() {
+	GosubControl.initOnce(this);
 	GosubControl.doEndsub();	
 }
 
 Selenium.prototype.doReturn = function() {
+	GosubControl.initOnce(this);
 	GosubControl.doEndsub();
 }
