@@ -4,43 +4,33 @@
 <head profile="http://selenium-ide.openqa.org/profiles/test-case">
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <link rel="selenium.base" href="http://localhost/" />
-<title>error_endsub_not_found</title>
+<title>error_sub_myfunc2_is_not_found</title>
 </head>
 <body>
 <table cellpadding="1" cellspacing="1" border="1">
 <thead>
-<tr><td rowspan="1" colspan="3">error_endsub_not_found</td></tr>
+<tr><td rowspan="1" colspan="3">error_sub_myfunc2_is_not_found</td></tr>
 </thead><tbody>
-<!--#Error:There is no "endsub" corresponding to "sub": line=5-->
+<!--#Error: "sub myfunc2" is not found-->
+<tr>
+	<td>gosub</td>
+	<td>myfunc1</td>
+	<td></td>
+</tr>
+<tr>
+	<td>gosub</td>
+	<td>myfunc2</td>
+	<td></td>
+</tr>
+<!--#-->
 <tr>
 	<td>sub</td>
 	<td>myfunc1</td>
 	<td></td>
 </tr>
 <tr>
-	<td>storeEval</td>
-	<td>parseInt(${X})+1</td>
-	<td>X</td>
-</tr>
-<tr>
 	<td>echo</td>
-	<td>${X}</td>
-	<td></td>
-</tr>
-<!--#-->
-<tr>
-	<td>sub</td>
-	<td>myfunc2</td>
-	<td></td>
-</tr>
-<tr>
-	<td>storeEval</td>
-	<td>parseInt(${X})+1</td>
-	<td>X</td>
-</tr>
-<tr>
-	<td>echo</td>
-	<td>${X}</td>
+	<td>myfunc1</td>
 	<td></td>
 </tr>
 <tr>
@@ -48,6 +38,8 @@
 	<td></td>
 	<td></td>
 </tr>
+<!--#-->
+
 </tbody></table>
 </body>
 </html>

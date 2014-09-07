@@ -36,21 +36,21 @@ function GosubControlClass() {
 	        switch( cmd.command.toLowerCase() ) {
 	            case "sub":
 	            	if ( lbl != '' ) {
-	            		throw new Error( "endsub not found: line=" + i );
+	            		throw new Error( 'There is no "endsub" corresponding to "sub": line=' + i );
 	            	}
 	            	lbl = cmd.target;
 	            	idx = i;
 	            	if ( lbl == '' ) {
-	            		throw new Error( "sub label is empty: line=" + i );
+	            		throw new Error( 'A label of "sub" is a blank: line=' + i );
 	            	}
 	            	if ( typeof this.labels[lbl] != 'undefined' ) {
-	            		throw new Error( "sub label is duplicated: line=" + i );
+	            		throw new Error( 'A label of "sub" appears twice or more: line=' + i );
 	            	}
 	            	break;
 	            	
 	            case "endsub":
 	            	if ( lbl == '' ) {
-	            		throw new Error( "sub not found: line=" + i );
+	            		throw new Error( 'There is no "sub" corresponding to "endsub": line=' + i );
 	            	}
 	            	this.labels[lbl] = {sub:idx, end:i};
 	            	lbl = '';
@@ -59,7 +59,7 @@ function GosubControlClass() {
 	        }
 	    }
 		if ( lbl != '' ) {
-			throw new Error( "endsub not found: line=" + i );
+			throw new Error( 'There is no "endsub" corresponding to "sub": line=' + i );
 		}
 	};
 
@@ -69,7 +69,7 @@ function GosubControlClass() {
 	
 	this.gotoSub = function ( i_label ) {
 	    if ( undefined == this.labels[i_label] ) {
-	        throw new Error( "sub '" + i_label + "' is not found." );
+	        throw new Error( '"sub ' + i_label + '" is not found.' );
 	    }
 
 		var idx = parseInt(this.labels[i_label].sub) - 1;
@@ -79,7 +79,7 @@ function GosubControlClass() {
 
 	this.gotoEndsub = function ( i_label ) {
 	    if ( undefined == this.labels[i_label] ) {
-	        throw new Error( "sub '" + i_label + "' is not found." );
+	        throw new Error( '"sub ' + i_label + '" is not found.' );
 	    }
 
 		var idx = parseInt(this.labels[i_label].end) - 1;
@@ -89,7 +89,7 @@ function GosubControlClass() {
 	
 	this.setIndex = function ( i_value ) {
 	    if (undefined == i_value || null == i_value || i_value < 0) {
-	        throw new Error( "Invalid index." );
+	        throw new Error( "Invalid index: index=" + i_value );
 	    }
 	    testCase.debugContext.debugIndex = i_value;		
 	};
