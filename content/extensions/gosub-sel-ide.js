@@ -7,15 +7,15 @@
  * It referred to Selenium IDE: Flow Control
  */
 function GosubControlClass() {
-	this.labels = {};
-	this.stack = [];
+	this.labels   = {};
+	this.stack    = [];
 	this.init_err = null;
 	
 	this.init = function () {
 		this.echo( 'gosubInit' );
 		
-	    this.labels = {};
-		this.stack = [];
+	    this.labels   = {};
+		this.stack    = [];
 		this.init_err = null;
 		
 		try {
@@ -32,30 +32,31 @@ function GosubControlClass() {
 	    for( var i = 0; i < testCase.commands.length; i++ ) {
 	    	var cmd = testCase.commands[i];
 	    	
-	        if (cmd.type == 'command')
-	        switch( cmd.command.toLowerCase() ) {
-	            case "sub":
-	            	if ( lbl != '' ) {
-	            		throw new Error( 'There is no "endsub" corresponding to "sub": line=' + i );
-	            	}
-	            	lbl = cmd.target;
-	            	idx = i;
-	            	if ( lbl == '' ) {
-	            		throw new Error( 'A label of "sub" is a blank: line=' + i );
-	            	}
-	            	if ( typeof this.labels[lbl] != 'undefined' ) {
-	            		throw new Error( 'A label of "sub" appears twice or more: line=' + i );
-	            	}
-	            	break;
-	            	
-	            case "endsub":
-	            	if ( lbl == '' ) {
-	            		throw new Error( 'There is no "sub" corresponding to "endsub": line=' + i );
-	            	}
-	            	this.labels[lbl] = {sub:idx, end:i};
-	            	lbl = '';
-	            	idx = -1;
-	                break;
+	        if ( 'command' == cmd.type ) {
+		        switch( cmd.command.toLowerCase() ) {
+		            case "sub":
+		            	if ( lbl != '' ) {
+		            		throw new Error( 'There is no "endsub" corresponding to "sub": line=' + i );
+		            	}
+		            	lbl = cmd.target;
+		            	idx = i;
+		            	if ( lbl == '' ) {
+		            		throw new Error( 'A label of "sub" is a blank: line=' + i );
+		            	}
+		            	if ( typeof this.labels[lbl] != 'undefined' ) {
+		            		throw new Error( 'A label of "sub" appears twice or more: line=' + i );
+		            	}
+		            	break;
+		            	
+		            case "endsub":
+		            	if ( lbl == '' ) {
+		            		throw new Error( 'There is no "sub" corresponding to "endsub": line=' + i );
+		            	}
+		            	this.labels[lbl] = {sub:idx, end:i};
+		            	lbl = '';
+		            	idx = -1;
+		                break;
+		        }
 	        }
 	    }
 		if ( lbl != '' ) {
@@ -156,7 +157,6 @@ Selenium.prototype.reset = function() {
 }
 
 Selenium.prototype.doGosubInit = function() {
-	LOG.info( 'gosubInit' );
 	GosubControl.init();
 }
 
