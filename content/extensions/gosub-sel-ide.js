@@ -9,13 +9,23 @@
 function GosubControlClass() {
 	this.labels = {};
 	this.stack = [];
+	this.init_err = null;
 	
 	this.init = function () {
 		this.echo( 'gosubInit' );
 		
 	    this.labels = {};
 		this.stack = [];
+		this.init_err = null;
 		
+		try {
+			this._init();
+		} catch (e) {
+			this.init_err = e;
+		}
+	};
+	
+	this._init = function () {
 	    var lbl = '';
 	    var idx = -1;
 	    
@@ -97,11 +107,19 @@ function GosubControlClass() {
 	};
 	
 	this.doGosub = function ( i_label ) {
+		if ( this.init_err != null ) {
+			throw this.init_err;
+		}
+		
 		this.stack.push( this.getIndex() );
 		this.gotoSub( i_label );
 	};
 	
 	this.doSub = function ( i_label ) {
+		if ( this.init_err != null ) {
+			throw this.init_err;
+		}
+		
 		if ( 0 == this.stack.length ) {
 			var idx = this.gotoEndsub( i_label );
 			this.echo( "sub : fall down, skip to line=" +  idx );
@@ -111,6 +129,10 @@ function GosubControlClass() {
 	};
 	
 	this.doEndsub = function () {
+		if ( this.init_err != null ) {
+			throw this.init_err;
+		}
+		
 		if ( 0 == this.stack.length ) {
 			this.echo( "endsub : fall down" );
 		} else {
