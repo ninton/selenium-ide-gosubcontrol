@@ -9,11 +9,9 @@
 function GosubControlClass() {
 	this.labels = {};
 	this.stack = [];
-	this.Selenium;
 	
-	this.init = function ( i_Selenium ) {
-		this.Selenium = i_Selenium;
-		this.Selenium.doEcho( 'gosubInit' );
+	this.init = function () {
+		this.echo( 'gosubInit' );
 		
 	    this.labels = {};
 		this.stack = [];
@@ -55,6 +53,10 @@ function GosubControlClass() {
 		}
 	};
 
+	this.echo = function ( i_mesg ) {
+		LOG.info( i_mesg );
+	};
+	
 	this.gotoSub = function ( i_label ) {
 	    if ( undefined == this.labels[i_label] ) {
 	        throw new Error( "sub '" + i_label + "' is not found." );
@@ -87,10 +89,10 @@ function GosubControlClass() {
 	};
 	
 	this.debug = function () {
-		this.Selenium.doEcho( 'gosubDebug' );
+		this.echo( 'gosubDebug' );
 		
 		for ( var label in this.labels ) {
-			this.Selenium.doEcho( "gosubDebug:sub|" + label + "|" + this.labels[label].sub + "|" + + this.labels[label].end);
+			this.echo( "gosubDebug:sub|" + label + "|" + this.labels[label].sub + "|" + + this.labels[label].end);
 		}
 	};
 	
@@ -102,18 +104,18 @@ function GosubControlClass() {
 	this.doSub = function ( i_label ) {
 		if ( 0 == this.stack.length ) {
 			var idx = this.gotoEndsub( i_label );
-			this.Selenium.doEcho( "sub : fall down, skip to line=" +  idx );
+			this.echo( "sub : fall down, skip to line=" +  idx );
 		} else {
-			this.Selenium.doEcho( "sub : from gosub" );
+			this.echo( "sub : from gosub" );
 		}
 	};
 	
 	this.doEndsub = function () {
 		if ( 0 == this.stack.length ) {
-			this.Selenium.doEcho( "endsub : fall down" );
+			this.echo( "endsub : fall down" );
 		} else {
 			var idx = this.stack.pop();
-			this.Selenium.doEcho( "endsub : goto line=" + idx );
+			this.echo( "endsub : goto line=" + idx );
 			this.setIndex( idx );
 		}
 	};
@@ -132,7 +134,8 @@ Selenium.prototype.reset = function() {
 }
 
 Selenium.prototype.doGosubInit = function() {
-	GosubControl.init(this);
+	LOG.info( 'gosubInit' );
+	GosubControl.init();
 }
 
 Selenium.prototype.doGosubDebug = function() {
