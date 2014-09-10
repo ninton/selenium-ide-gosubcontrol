@@ -1,6 +1,6 @@
 # Selenium IDE: Gosub Control
 
-Adds gosub control to Selenium IDE.
+Adds "gosub", "sub" and "endsub" commands to Selenium IDE.
 
 ## Lincense
 
@@ -34,16 +34,54 @@ From source:
 * gosub - goto subroutine
 * sub - subroutine start
 * endsub - subroutine end and return
+* gosubDebug - show list of the labels of "sub"
 * return - return
+* gosubInit - It is due to abolish
 
 ### Examples
 
-See demos folder for examples of all commands.
+See also demos folder.
+
+#### The extract of an actual test case. 
+
+gosub reset_failed_logins
+gosub login_miss_pw
+gosub get_failed_logins
+verifyExpression ${FAILED_LOGINS} 1
+
+sub login_miss_pw
+open http://user-site//login
+waitForPageToLoad
+type name=username test_user
+type name=password 
+clickAndWait id=btnLogin
+assertLocation http://user-site//login
+endsub
+
+sub reset_failed_logins
+...login admin site
+...find test_user
+...click security tab
+...reset "failed logins"
+...logout
+endsub
+
+sub get_failed_logins
+...login admin site
+...find test_user
+...click security tab
+...store "failed logins"
+...logout
+endsub
 
 ## Credits
 
-* Aoki Makoto
+* Aoki Makoto, Ninton G.K.
 
 ### Reference
 
-* flowcontrol plugin
+Selenium IDE: Flow Control
+author: Author: Dave Hunt
+https://github.com/davehunt/selenium-ide-flowcontrol
+https://addons.mozilla.org/ja/firefox/addon/flow-control/
+
