@@ -80,8 +80,7 @@ See also demos folder.
 
 ### Reference
 
-Selenium IDE: Flow Control
-author: Author: Dave Hunt
-https://github.com/davehunt/selenium-ide-flowcontrol
+Selenium IDE: Flow Control  
+author: Author: Dave Hunt  
+https://github.com/davehunt/selenium-ide-flowcontrol  
 https://addons.mozilla.org/ja/firefox/addon/flow-control/
-
