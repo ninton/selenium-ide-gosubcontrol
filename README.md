@@ -59,19 +59,19 @@ See also demos folder.
     endsub
     　　
     sub reset_failed_logins
-    \#login admin site
-    \#find test_user
-    \#click security tab
-    \#reset "failed logins"
-    \#logout
+    #login admin site
+    #find test_user
+    #click security tab
+    #reset "failed logins"
+    #logout
     endsub
     　　
     sub get_failed_logins
-    \#login admin site
-    \#find test_user
-    \#click security tab
-    \#store "failed logins"
-    \#logout
+    #login admin site
+    #find test_user
+    #click security tab
+    #store "failed logins"
+    #logout
     endsub
 
 ## Credits
