@@ -44,35 +44,35 @@ See also demos folder.
 
 #### The extract of an actual test case. 
 
-    gosub reset_failed_logins　　
-    gosub login_miss_pw　　
-    gosub get_failed_logins　　
-    verifyExpression ${FAILED_LOGINS} 1　　
+    gosub reset_failed_logins
+    gosub login_miss_pw
+    gosub get_failed_logins
+    verifyExpression ${FAILED_LOGINS} 1
     　　
-    sub login_miss_pw　　
-    open http://user-site//login　　
-    waitForPageToLoad　　
-    type name=username test_user　　
-    type name=password　　
-    clickAndWait id=btnLogin　　
-    assertLocation http://user-site//login　　
-    endsub　　
+    sub login_miss_pw
+    open http://user-site//login
+    waitForPageToLoad
+    type name=username test_user
+    type name=password
+    clickAndWait id=btnLogin
+    assertLocation http://user-site//login
+    endsub
     　　
-    sub reset_failed_logins　　
-    \#login admin site　　
-    \#find test_user　　
-    \#click security tab　　
-    \#reset "failed logins"　　
-    \#logout　　
-    endsub　　
+    sub reset_failed_logins
+    \#login admin site
+    \#find test_user
+    \#click security tab
+    \#reset "failed logins"
+    \#logout
+    endsub
     　　
-    sub get_failed_logins　　
-    \#login admin site　　
-    \#find test_user　　
-    \#click security tab　　
-    \#store "failed logins"　　
-    \#logout　　
-    endsub　　
+    sub get_failed_logins
+    \#login admin site
+    \#find test_user
+    \#click security tab
+    \#store "failed logins"
+    \#logout
+    endsub
 
 ## Credits
 
