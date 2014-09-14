@@ -4,7 +4,7 @@
     <Description about="urn:mozilla:install-manifest">
         <em:id>gosubcontrol@ninton.co.jp</em:id>
         <em:name>Selenium IDE: Gosub Control</em:name>
-        <em:version>1.1.1</em:version>
+        <em:version>1.1.2</em:version>
         <em:creator>Aoki Makoto, Ninton G.K.</em:creator>
         <em:description>A gosub control plugin for Selenium-IDE</em:description>
         <em:type>2</em:type> <!--Type extension-->
