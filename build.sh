@@ -14,9 +14,6 @@ rm -rf $TMP_DIR
 mkdir -p $TMP_DIR/chrome/content
 
 cp -v -R content $TMP_DIR/chrome
-cp -v -R locale $TMP_DIR/chrome
-cp -v -R skin $TMP_DIR/chrome
-cp -v -R defaults $TMP_DIR
 cp -v install.rdf $TMP_DIR
 cp -v chrome.manifest.production $TMP_DIR/chrome.manifest
 

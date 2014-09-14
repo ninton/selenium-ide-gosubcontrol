@@ -15,9 +15,6 @@ del /S /Q %TMP_DIR%
 mkdir %TMP_DIR%\chrome\content
 
 robocopy content %TMP_DIR%\chrome\content /E
-robocopy locale %TMP_DIR%\chrome\locale /E
-robocopy skin %TMP_DIR%\chrome\skin /E
-robocopy defaults %TMP_DIR%\defaults /E
 copy install.rdf %TMP_DIR%
 copy chrome.manifest.production %TMP_DIR%\chrome.manifest
 
