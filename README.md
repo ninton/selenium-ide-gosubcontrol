@@ -8,7 +8,7 @@ Mozilla Public License - https://www.mozilla.org/MPL/
 
 ## Requirements
 
-* Selenium IDE 1.0.5 or later
+* Selenium IDE 2.4 - 2.8
  
 To build on Windows you will need 7-Zip and Robocopy:
 
