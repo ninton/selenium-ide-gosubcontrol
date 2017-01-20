@@ -47,12 +47,12 @@ function GosubControlClass() {
 	        if ( 'command' == cmd.type ) {
 		        switch( cmd.command.toLowerCase() ) {
 		            case "sub":
-		            	if ( lbl != '' ) {
+		                if ( lbl !== '' ) {
 		            		throw new Error( 'There is no "endsub" corresponding to "sub": line=' + i );
 		            	}
 		            	lbl = cmd.target;
 		            	idx = i;
-		            	if ( lbl == '' ) {
+		                if ( lbl === '' ) {
 		            		throw new Error( 'A label of "sub" is a blank: line=' + i );
 		            	}
 		            	if ( typeof this.labels[lbl] != 'undefined' ) {
@@ -61,7 +61,7 @@ function GosubControlClass() {
 		            	break;
 		            	
 		            case "endsub":
-		            	if ( lbl == '' ) {
+		                if ( lbl === '' ) {
 		            		throw new Error( 'There is no "sub" corresponding to "endsub": line=' + i );
 		            	}
 		            	this.labels[lbl] = {sub:idx, end:i};
@@ -71,7 +71,7 @@ function GosubControlClass() {
 		        }
 	        }
 	    }
-		if ( lbl != '' ) {
+		if ( lbl !== '' ) {
 			throw new Error( 'There is no "endsub" corresponding to "sub": line=' + i );
 		}
 	};
@@ -81,7 +81,7 @@ function GosubControlClass() {
 	};
 	
 	this.gotoSub = function ( i_label ) {
-	    if ( undefined == this.labels[i_label] ) {
+	    if ( undefined === this.labels[i_label] ) {
 	        throw new Error( '"sub ' + i_label + '" is not found.' );
 	    }
 
@@ -91,7 +91,7 @@ function GosubControlClass() {
 	};
 
 	this.gotoEndsub = function ( i_label ) {
-	    if ( undefined == this.labels[i_label] ) {
+	    if ( undefined === this.labels[i_label] ) {
 	        throw new Error( '"sub ' + i_label + '" is not found.' );
 	    }
 
@@ -101,7 +101,7 @@ function GosubControlClass() {
 	};
 	
 	this.setIndex = function ( i_value ) {
-	    if (undefined == i_value || null == i_value || i_value < 0) {
+	    if (undefined === i_value || null === i_value || i_value < 0) {
 	        throw new Error( "Invalid index: index=" + i_value );
 	    }
 	    testCase.debugContext.debugIndex = i_value;		
@@ -115,12 +115,12 @@ function GosubControlClass() {
 		this.echo( 'gosubDebug' );
 		
 		for ( var label in this.labels ) {
-			this.echo( "gosubDebug:sub|" + label + "|" + this.labels[label].sub + "|" + + this.labels[label].end);
+			this.echo( "gosubDebug:sub|" + label + "|" + this.labels[label].sub + "|" + this.labels[label].end);
 		}
 	};
 	
 	this.doGosub = function ( i_label ) {
-		if ( this.init_err != null ) {
+		if ( this.init_err !== null ) {
 			throw this.init_err;
 		}
 		
@@ -129,11 +129,11 @@ function GosubControlClass() {
 	};
 	
 	this.doSub = function ( i_label ) {
-		if ( this.init_err != null ) {
+		if ( this.init_err !== null ) {
 			throw this.init_err;
 		}
 		
-		if ( 0 == this.stack.length ) {
+		if ( 0 === this.stack.length ) {
 			var idx = this.gotoEndsub( i_label );
 			this.echo( "sub : fall down, skip to line=" +  idx );
 		} else {
@@ -142,11 +142,11 @@ function GosubControlClass() {
 	};
 	
 	this.doEndsub = function () {
-		if ( this.init_err != null ) {
+		if ( this.init_err !== null ) {
 			throw this.init_err;
 		}
 		
-		if ( 0 == this.stack.length ) {
+		if ( 0 === this.stack.length ) {
 			this.echo( "endsub : fall down" );
 		} else {
 			var idx = this.stack.pop();
@@ -161,29 +161,29 @@ var GosubControl = new GosubControlClass();
 
 Selenium.prototype.doGosubInit = function() {
 	GosubControl.init();
-}
+};
 
 Selenium.prototype.doGosubDebug = function() {
 	GosubControl.initOnce(this);
 	GosubControl.debug();
-}
+};
 
 Selenium.prototype.doGosub = function( i_label ) {
 	GosubControl.initOnce(this);
 	GosubControl.doGosub( i_label );
-}
+};
 
 Selenium.prototype.doSub = function( i_label ) {
 	GosubControl.initOnce(this);
 	GosubControl.doSub( i_label );
-}
+};
 
 Selenium.prototype.doEndsub = function() {
 	GosubControl.initOnce(this);
 	GosubControl.doEndsub();	
-}
+};
 
 Selenium.prototype.doReturn = function() {
 	GosubControl.initOnce(this);
 	GosubControl.doEndsub();
-}
+};
