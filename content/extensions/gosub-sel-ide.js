@@ -45,42 +45,41 @@ function GosubControlClass() {
 
     self.initBody = function () {
         var lbl = '',
-            idx = -1,
-            i,
-            cmd;
+            idx = -1;
 
-        for (i = 0; i < testCase.commands.length; i += 1) {
-            cmd = testCase.commands[i];
-
-            if ('command' === cmd.type) {
-                switch (cmd.command.toLowerCase()) {
-                    case "sub":
-                        if (lbl !== '') {
-                            throw new Error('There is no "endsub" corresponding to "sub": line=' + i);
-                        }
-                        lbl = cmd.target;
-                        idx = i;
-                        if (lbl === '') {
-                            throw new Error('A label of "sub" is a blank: line=' + i);
-                        }
-                        if (self.labels[lbl] !== undefined) {
-                            throw new Error('A label of "sub" appears twice or more: line=' + i);
-                        }
-                        break;
-
-                    case "endsub":
-                        if (lbl === '') {
-                            throw new Error('There is no "sub" corresponding to "endsub": line=' + i);
-                        }
-                        self.labels[lbl] = {sub: idx, end: i};
-                        lbl = '';
-                        idx = -1;
-                        break;
-                }
+        testCase.commands.forEach(function (cmd, i) {
+            if ('command' !== cmd.type) {
+                return;
             }
-        }
+
+            switch (cmd.command.toLowerCase()) {
+                case "sub":
+                    if (lbl !== '') {
+                        throw new Error('There is no "endsub" corresponding to "sub": line=' + i);
+                    }
+                    lbl = cmd.target;
+                    idx = i;
+                    if (lbl === '') {
+                        throw new Error('A label of "sub" is a blank: line=' + i);
+                    }
+                    if (self.labels[lbl] !== undefined) {
+                        throw new Error('A label of "sub" appears twice or more: line=' + i);
+                    }
+                    break;
+
+                case "endsub":
+                    if (lbl === '') {
+                        throw new Error('There is no "sub" corresponding to "endsub": line=' + i);
+                    }
+                    self.labels[lbl] = {sub: idx, end: i};
+                    lbl = '';
+                    idx = -1;
+                    break;
+            }
+        });
+        
         if (lbl !== '') {
-            throw new Error('There is no "endsub" corresponding to "sub": line=' + i);
+            throw new Error('There is no "endsub" corresponding to "sub": line=' + testCase.commands.length);
         }
     };
 
