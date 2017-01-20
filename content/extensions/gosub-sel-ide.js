@@ -11,11 +11,13 @@
 function GosubControlClass() {
     "use strict";
 
-    this.labels   = {};
-    this.stack    = [];
-    this.init_err = null;
+    var self = {};
 
-    this.initOnce = function (io_selenium) {
+    self.labels   = {};
+    self.stack    = [];
+    self.init_err = null;
+
+    self.initOnce = function (io_selenium) {
         // issue #2: If "Flow Control" is installed, this cannot be initialized correctly
         // [MEMO] htmlTestRunner.metrics.startTime is undefined.
         // [MEMO] testCase.lastModifiedTime is same as testCase.file.lastModifiedTime.
@@ -23,25 +25,25 @@ function GosubControlClass() {
             return;
         }
 
-        this.init();
+        self.init();
         io_selenium.gosub_initialized = true;
     };
 
-    this.init = function () {
-        this.echo('gosubInit');
+    self.init = function () {
+        self.echo('gosubInit');
 
-        this.labels   = {};
-        this.stack    = [];
-        this.init_err = null;
+        self.labels   = {};
+        self.stack    = [];
+        self.init_err = null;
 
         try {
-            this.initBody();
+            self.initBody();
         } catch (e) {
-            this.init_err = e;
+            self.init_err = e;
         }
     };
 
-    this.initBody = function () {
+    self.initBody = function () {
         var lbl = '',
             idx = -1,
             i,
@@ -61,7 +63,7 @@ function GosubControlClass() {
                         if (lbl === '') {
                             throw new Error('A label of "sub" is a blank: line=' + i);
                         }
-                        if (this.labels[lbl] !== undefined) {
+                        if (self.labels[lbl] !== undefined) {
                             throw new Error('A label of "sub" appears twice or more: line=' + i);
                         }
                         break;
@@ -70,7 +72,7 @@ function GosubControlClass() {
                         if (lbl === '') {
                             throw new Error('There is no "sub" corresponding to "endsub": line=' + i);
                         }
-                        this.labels[lbl] = {sub: idx, end: i};
+                        self.labels[lbl] = {sub: idx, end: i};
                         lbl = '';
                         idx = -1;
                         break;
@@ -82,90 +84,92 @@ function GosubControlClass() {
         }
     };
 
-    this.echo = function (i_mesg) {
+    self.echo = function (i_mesg) {
         LOG.info(i_mesg);
     };
 
-    this.gotoSub = function (i_label) {
+    self.gotoSub = function (i_label) {
         var idx;
 
-        if (undefined === this.labels[i_label]) {
+        if (undefined === self.labels[i_label]) {
             throw new Error('"sub ' + i_label + '" is not found.');
         }
 
-        idx = parseInt(this.labels[i_label].sub, 10) - 1;
-        this.setIndex(idx);
+        idx = parseInt(self.labels[i_label].sub, 10) - 1;
+        self.setIndex(idx);
         return idx;
     };
 
-    this.gotoEndsub = function (i_label) {
-        if (undefined === this.labels[i_label]) {
+    self.gotoEndsub = function (i_label) {
+        if (undefined === self.labels[i_label]) {
             throw new Error('"sub ' + i_label + '" is not found.');
         }
 
-        var idx = parseInt(this.labels[i_label].end, 10) - 1;
-        this.setIndex(idx);
+        var idx = parseInt(self.labels[i_label].end, 10) - 1;
+        self.setIndex(idx);
         return idx;
     };
 
-    this.setIndex = function (i_value) {
+    self.setIndex = function (i_value) {
         if (undefined === i_value || null === i_value || i_value < 0) {
             throw new Error("Invalid index: index=" + i_value);
         }
         testCase.debugContext.debugIndex = i_value;
     };
 
-    this.getIndex = function () {
+    self.getIndex = function () {
         return testCase.debugContext.debugIndex;
     };
 
-    this.debug = function () {
-        this.echo('gosubDebug');
+    self.debug = function () {
+        self.echo('gosubDebug');
 
-        Object.keys(this.labels).forEach(function(label) {
-            this.echo("gosubDebug:sub|" + label + "|" + this.labels[label].sub + "|" + this.labels[label].end);
+        Object.keys(self.labels).forEach(function(label) {
+            self.echo("gosubDebug:sub|" + label + "|" + self.labels[label].sub + "|" + self.labels[label].end);
         });
     };
 
-    this.doGosub = function (i_label) {
-        if (this.init_err !== null) {
-            throw this.init_err;
+    self.doGosub = function (i_label) {
+        if (self.init_err !== null) {
+            throw self.init_err;
         }
 
-        this.stack.push(this.getIndex());
-        this.gotoSub(i_label);
+        self.stack.push(self.getIndex());
+        self.gotoSub(i_label);
     };
 
-    this.doSub = function (i_label) {
+    self.doSub = function (i_label) {
         var idx;
 
-        if (this.init_err !== null) {
-            throw this.init_err;
+        if (self.init_err !== null) {
+            throw self.init_err;
         }
 
-        if (0 === this.stack.length) {
-            idx = this.gotoEndsub(i_label);
-            this.echo("sub : fall down, skip to line=" +  idx);
+        if (0 === self.stack.length) {
+            idx = self.gotoEndsub(i_label);
+            self.echo("sub : fall down, skip to line=" +  idx);
         } else {
-            this.echo("sub : from gosub");
+            self.echo("sub : from gosub");
         }
     };
 
-    this.doEndsub = function () {
+    self.doEndsub = function () {
         var idx;
 
-        if (this.init_err !== null) {
-            throw this.init_err;
+        if (self.init_err !== null) {
+            throw self.init_err;
         }
 
-        if (0 === this.stack.length) {
-            this.echo("endsub : fall down");
+        if (0 === self.stack.length) {
+            self.echo("endsub : fall down");
         } else {
-            idx = this.stack.pop();
-            this.echo("endsub : goto line=" + idx);
-            this.setIndex(idx);
+            idx = self.stack.pop();
+            self.echo("endsub : goto line=" + idx);
+            self.setIndex(idx);
         }
     };
+
+    return self;
 }
 
 var GosubControl = new GosubControlClass();
