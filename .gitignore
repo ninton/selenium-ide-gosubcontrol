@@ -4,3 +4,5 @@
 /content/extensions/*.bak
 .project
 .settings
+/test/testResults/*.xml
+

@@ -11,11 +11,31 @@
 function GosubControlClass() {
     "use strict";
 
+    var MyLog = function () {
+        var self = {};
+
+        self.info = function (mesg) {
+            LOG.info(mesg);
+        };
+
+        self.debug = function (mesg) {
+            LOG.debug(mesg);
+        };
+
+        return self;
+    };
+
+    var MyError = function (errnum, message) {
+        var self = new Error(message);
+        self.errnum = errnum;
+        return self;
+    };
+
     var self = {};
 
+    self.log = new MyLog();
     self.labels   = {};
     self.stack    = [];
-    self.init_err = null;
 
     self.initOnce = function (io_selenium) {
         // issue #2: If "Flow Control" is installed, this cannot be initialized correctly
@@ -30,17 +50,12 @@ function GosubControlClass() {
     };
 
     self.init = function () {
-        self.echo('gosubInit');
+        self.log.info('gosubInit');
 
         self.labels   = {};
         self.stack    = [];
-        self.init_err = null;
 
-        try {
-            self.initBody();
-        } catch (e) {
-            self.init_err = e;
-        }
+        self.initBody();
     };
 
     self.initBody = function () {
@@ -54,22 +69,25 @@ function GosubControlClass() {
 
             switch (cmd.command.toLowerCase()) {
                 case "sub":
-                    if (lbl !== '') {
-                        throw new Error('There is no "endsub" corresponding to "sub": line=' + i);
+                    if (cmd.target === undefined || cmd.target === '') {
+                        self.error('E01', 'A label of "sub" is a blank: line=' + i);
                     }
+
+                    if (self.labels[cmd.target] !== undefined) {
+                        self.error('E02', 'A label of "sub" appears twice or more: line=' + i);
+                    }
+
+                    if (lbl !== '') {
+                        self.error('E03', 'There is no "endsub" corresponding to "sub": line=' + i);
+                    }
+
                     lbl = cmd.target;
                     idx = i;
-                    if (lbl === '') {
-                        throw new Error('A label of "sub" is a blank: line=' + i);
-                    }
-                    if (self.labels[lbl] !== undefined) {
-                        throw new Error('A label of "sub" appears twice or more: line=' + i);
-                    }
                     break;
 
                 case "endsub":
                     if (lbl === '') {
-                        throw new Error('There is no "sub" corresponding to "endsub": line=' + i);
+                        self.error('E04', 'There is no "sub" corresponding to "endsub": line=' + i);
                     }
                     self.labels[lbl] = {sub: idx, end: i};
                     lbl = '';
@@ -79,19 +97,21 @@ function GosubControlClass() {
         });
         
         if (lbl !== '') {
-            throw new Error('There is no "endsub" corresponding to "sub": line=' + testCase.commands.length);
+            self.error('E05', 'There is no "endsub" corresponding to "sub": line=' + testCase.commands.length);
         }
     };
 
-    self.echo = function (i_mesg) {
-        LOG.info(i_mesg);
+    self.error = function (errnum, mesg) {
+        self.dump();
+
+        throw new MyError(errnum, mesg);
     };
 
     self.gotoSub = function (i_label) {
         var idx;
 
         if (undefined === self.labels[i_label]) {
-            throw new Error('"sub ' + i_label + '" is not found.');
+            self.error("E06", '"sub ' + i_label + '" is not found.');
         }
 
         idx = parseInt(self.labels[i_label].sub, 10) - 1;
@@ -100,18 +120,20 @@ function GosubControlClass() {
     };
 
     self.gotoEndsub = function (i_label) {
+        var idx;
+
         if (undefined === self.labels[i_label]) {
-            throw new Error('"sub ' + i_label + '" is not found.');
+            self.error("E07", '"sub ' + i_label + '" is not found.');
         }
 
-        var idx = parseInt(self.labels[i_label].end, 10) - 1;
+        idx = parseInt(self.labels[i_label].end, 10) - 1;
         self.setIndex(idx);
         return idx;
     };
 
     self.setIndex = function (i_value) {
         if (undefined === i_value || null === i_value || i_value < 0) {
-            throw new Error("Invalid index: index=" + i_value);
+            self.error("E08", "Invalid index: index=" + i_value);
         }
         testCase.debugContext.debugIndex = i_value;
     };
@@ -120,19 +142,16 @@ function GosubControlClass() {
         return testCase.debugContext.debugIndex;
     };
 
-    self.debug = function () {
-        self.echo('gosubDebug');
-
+    self.dump = function () {
         Object.keys(self.labels).forEach(function(label) {
-            self.echo("gosubDebug:sub|" + label + "|" + self.labels[label].sub + "|" + self.labels[label].end);
+            self.log.info("labels:" + label + "|" + self.labels[label].sub + "|" + self.labels[label].end);
+        });
+        Object.keys(self.stack).forEach(function(index) {
+            self.log.info("stack:" + index);
         });
     };
 
     self.doGosub = function (i_label) {
-        if (self.init_err !== null) {
-            throw self.init_err;
-        }
-
         self.stack.push(self.getIndex());
         self.gotoSub(i_label);
     };
@@ -140,30 +159,22 @@ function GosubControlClass() {
     self.doSub = function (i_label) {
         var idx;
 
-        if (self.init_err !== null) {
-            throw self.init_err;
-        }
-
         if (0 === self.stack.length) {
             idx = self.gotoEndsub(i_label);
-            self.echo("sub : fall down, skip to line=" +  idx);
+            self.log.info("sub : fall down, skip to line=" +  idx);
         } else {
-            self.echo("sub : from gosub");
+            self.log.info("sub : from gosub");
         }
     };
 
     self.doEndsub = function () {
         var idx;
 
-        if (self.init_err !== null) {
-            throw self.init_err;
-        }
-
         if (0 === self.stack.length) {
-            self.echo("endsub : fall down");
+            self.log.info("endsub : fall down");
         } else {
             idx = self.stack.pop();
-            self.echo("endsub : goto line=" + idx);
+            self.log.info("endsub : goto line=" + idx);
             self.setIndex(idx);
         }
     };
@@ -181,8 +192,7 @@ Selenium.prototype.doGosubInit = function () {
 
 Selenium.prototype.doGosubDebug = function () {
     "use strict";
-    GosubControl.initOnce(this);
-    GosubControl.debug();
+    GosubControl.dump();
 };
 
 Selenium.prototype.doGosub = function (i_label) {
