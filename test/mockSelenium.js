@@ -12,4 +12,19 @@ var testCase = {
     }
 };
 
-var LOG;
+var LOG = (function () {
+    var self = {};
+
+    self.infoMessages = [];
+    self.debugMessages = [];
+
+    self.info = function (mesg) {
+        self.infoMessages.push(mesg);
+    };
+
+    self.debug = function (mesg) {
+        self.debugMessages.push(mesg);
+    };
+
+    return self;
+}());

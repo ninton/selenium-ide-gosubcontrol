@@ -11,20 +11,6 @@
 function GosubControlClass() {
     "use strict";
 
-    var MyLog = function () {
-        var self = {};
-
-        self.info = function (mesg) {
-            LOG.info(mesg);
-        };
-
-        self.debug = function (mesg) {
-            LOG.debug(mesg);
-        };
-
-        return self;
-    };
-
     var MyError = function (errnum, message) {
         var self = new Error(message);
         self.errnum = errnum;
@@ -33,9 +19,9 @@ function GosubControlClass() {
 
     var self = {};
 
-    self.log = new MyLog();
-    self.labels   = {};
-    self.stack    = [];
+    self.log    = null;
+    self.labels = {};
+    self.stack  = [];
 
     self.initOnce = function (io_selenium) {
         // issue #2: If "Flow Control" is installed, this cannot be initialized correctly
@@ -101,6 +87,10 @@ function GosubControlClass() {
         }
     };
 
+    self.setLog = function (log) {
+        self.log = log;
+    };
+
     self.error = function (errnum, mesg) {
         self.dump();
 
@@ -132,7 +122,7 @@ function GosubControlClass() {
     };
 
     self.setIndex = function (i_value) {
-        if (undefined === i_value || null === i_value || i_value < 0) {
+        if (undefined === i_value || null === i_value || i_value < -1) {
             self.error("E08", "Invalid index: index=" + i_value);
         }
         testCase.debugContext.debugIndex = i_value;
@@ -187,34 +177,40 @@ var GosubControl = new GosubControlClass();
 
 Selenium.prototype.doGosubInit = function () {
     "use strict";
+    GosubControl.setLog(LOG);
     GosubControl.init();
 };
 
 Selenium.prototype.doGosubDebug = function () {
     "use strict";
+    GosubControl.setLog(LOG);
     GosubControl.dump();
 };
 
 Selenium.prototype.doGosub = function (i_label) {
     "use strict";
+    GosubControl.setLog(LOG);
     GosubControl.initOnce(this);
     GosubControl.doGosub(i_label);
 };
 
 Selenium.prototype.doSub = function (i_label) {
     "use strict";
+    GosubControl.setLog(LOG);
     GosubControl.initOnce(this);
     GosubControl.doSub(i_label);
 };
 
 Selenium.prototype.doEndsub = function () {
     "use strict";
+    GosubControl.setLog(LOG);
     GosubControl.initOnce(this);
     GosubControl.doEndsub();
 };
 
 Selenium.prototype.doReturn = function () {
     "use strict";
+    GosubControl.setLog(LOG);
     GosubControl.initOnce(this);
     GosubControl.doEndsub();
 };
