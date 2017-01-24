@@ -2,10 +2,11 @@
 /*global YUI */
 /*global Selenium, LOG, testCase */
 /*global GosubControl */
-"use strict";
 
 YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "phantomjs",
     function(Y) {
+        "use strict";
+
         var MockLOG,
             areSame,
             areSameArray,
@@ -193,7 +194,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
                     }
                 ];
 
-                testData.forEach(function(data, ignore) {
+                testData.forEach(function(data) {
                     var selenium = null,
                         myLog    = null;
 
@@ -265,7 +266,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
                     }
                 ];
 
-                testData.forEach(function(data, ignore) {
+                testData.forEach(function(data) {
                     var selenium = null,
                         myLog    = null;
 
@@ -285,7 +286,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
             }
         }));
 
-        var testInit_Error = function(data, ignore) {
+        function testInit_Error (data) {
             var selenium = null,
                 myLog    = null,
                 errnum   = "";
@@ -305,7 +306,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
             }
 
             Y.Assert.areSame(data.expected.errnum, errnum);
-        };
+        }
 
         Y.Test.Runner.add(new Y.Test.Case({
             name: "testInit_E01",
@@ -469,35 +470,32 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 GosubControl.setLog(myLog);
 
-                if (true) {
-                    testCase.debugContext.debugIndex = 0;
+                //
+                testCase.debugContext.debugIndex = 0;
 
-                    selenium.doGosub("mysub1");
+                selenium.doGosub("mysub1");
 
-                    Y.Assert.areSame(2, GosubControl.labels.mysub1.sub);
-                    Y.Assert.areSame(3, GosubControl.labels.mysub1.end);
-                    areSameArray([0], GosubControl.stack);
+                Y.Assert.areSame(2, GosubControl.labels.mysub1.sub);
+                Y.Assert.areSame(3, GosubControl.labels.mysub1.end);
+                areSameArray([0], GosubControl.stack);
 
-                    Y.Assert.areSame(1, testCase.debugContext.debugIndex);
-                }
+                Y.Assert.areSame(1, testCase.debugContext.debugIndex);
 
-                if (false) {
-                    testCase.debugContext.debugIndex = 2;
+                //
+                testCase.debugContext.debugIndex = 2;
 
-                    selenium.doSub("mysub1");
+                selenium.doSub("mysub1");
 
-                    areSameArray([0], GosubControl.stack);
-                    Y.Assert.areSame(2, testCase.debugContext.debugIndex);
-                }
+                areSameArray([0], GosubControl.stack);
+                Y.Assert.areSame(2, testCase.debugContext.debugIndex);
 
-                if (false) {
-                    testCase.debugContext.debugIndex = 4;
+                //
+                testCase.debugContext.debugIndex = 4;
 
-                    selenium.doEndsub("");
+                selenium.doEndsub("");
 
-                    areSameArray([], GosubControl.stack);
-                    Y.Assert.areSame(0, testCase.debugContext.debugIndex);
-                }
+                areSameArray([], GosubControl.stack);
+                Y.Assert.areSame(0, testCase.debugContext.debugIndex);
             }
         }));
 
@@ -523,100 +521,90 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 testCase.commands = data.commands;
 
-                if (true) {
-                    testCase.debugContext.debugIndex = 0;
+                //
+                testCase.debugContext.debugIndex = 0;
 
-                    selenium.doSub("mysub1");
+                selenium.doSub("mysub1");
 
-                    Y.Assert.areSame(0, GosubControl.labels.mysub1.sub);
-                    Y.Assert.areSame(2, GosubControl.labels.mysub1.end);
-                    Y.Assert.areSame(3, GosubControl.labels.mysub2.sub);
-                    Y.Assert.areSame(4, GosubControl.labels.mysub2.end);
-                    areSameArray([], GosubControl.stack);
+                Y.Assert.areSame(0, GosubControl.labels.mysub1.sub);
+                Y.Assert.areSame(2, GosubControl.labels.mysub1.end);
+                Y.Assert.areSame(3, GosubControl.labels.mysub2.sub);
+                Y.Assert.areSame(4, GosubControl.labels.mysub2.end);
+                areSameArray([], GosubControl.stack);
 
-                    Y.Assert.areSame(1, testCase.debugContext.debugIndex);
-                }
+                Y.Assert.areSame(1, testCase.debugContext.debugIndex);
 
-                if (true) {
-                    testCase.debugContext.debugIndex = 2;
+                //
+                testCase.debugContext.debugIndex = 2;
 
-                    selenium.doEndsub("mysub1");
+                selenium.doEndsub("mysub1");
 
-                    areSameArray([], GosubControl.stack);
-                    Y.Assert.areSame(2, testCase.debugContext.debugIndex);
-                }
+                areSameArray([], GosubControl.stack);
+                Y.Assert.areSame(2, testCase.debugContext.debugIndex);
 
-                if (true) {
-                    testCase.debugContext.debugIndex = 3;
+                //
+                testCase.debugContext.debugIndex = 3;
 
-                    selenium.doSub("mysub2");
+                selenium.doSub("mysub2");
 
-                    areSameArray([], GosubControl.stack);
-                    Y.Assert.areSame(3, testCase.debugContext.debugIndex);
-                }
+                areSameArray([], GosubControl.stack);
+                Y.Assert.areSame(3, testCase.debugContext.debugIndex);
 
-                if (true) {
-                    testCase.debugContext.debugIndex = 4;
+                //
+                testCase.debugContext.debugIndex = 4;
 
-                    selenium.doEndsub("");
+                selenium.doEndsub("");
 
-                    areSameArray([], GosubControl.stack);
-                    Y.Assert.areSame(4, testCase.debugContext.debugIndex);
-                }
+                areSameArray([], GosubControl.stack);
+                Y.Assert.areSame(4, testCase.debugContext.debugIndex);
 
-                if (true) {
-                    testCase.debugContext.debugIndex = 5;
+                //
+                testCase.debugContext.debugIndex = 5;
 
-                    selenium.doGosub("mysub1");
+                selenium.doGosub("mysub1");
 
-                    areSameArray([5], GosubControl.stack);
-                    Y.Assert.areSame(-1, testCase.debugContext.debugIndex);
-                }
+                areSameArray([5], GosubControl.stack);
+                Y.Assert.areSame(-1, testCase.debugContext.debugIndex);
 
-                if (true) {
-                    testCase.debugContext.debugIndex = 0;
+                //
+                testCase.debugContext.debugIndex = 0;
 
-                    selenium.doSub("mysub1");
+                selenium.doSub("mysub1");
 
-                    areSameArray([5], GosubControl.stack);
-                    Y.Assert.areSame(0, testCase.debugContext.debugIndex);
-                }
+                areSameArray([5], GosubControl.stack);
+                Y.Assert.areSame(0, testCase.debugContext.debugIndex);
 
-                if (true) {
-                    testCase.debugContext.debugIndex = 1;
+                //
+                testCase.debugContext.debugIndex = 1;
 
-                    selenium.doGosub("mysub2");
+                selenium.doGosub("mysub2");
 
-                    areSameArray([5,1], GosubControl.stack);
-                    Y.Assert.areSame(2, testCase.debugContext.debugIndex);
-                }
+                areSameArray([5,1], GosubControl.stack);
+                Y.Assert.areSame(2, testCase.debugContext.debugIndex);
 
-                if (true) {
-                    testCase.debugContext.debugIndex = 3;
+                //
+                testCase.debugContext.debugIndex = 3;
 
-                    selenium.doSub("mysub1");
+                selenium.doSub("mysub1");
 
-                    areSameArray([5,1], GosubControl.stack);
-                    Y.Assert.areSame(3, testCase.debugContext.debugIndex);
-                }
+                areSameArray([5,1], GosubControl.stack);
+                Y.Assert.areSame(3, testCase.debugContext.debugIndex);
 
-                if (true) {
-                    testCase.debugContext.debugIndex = 4;
+                //
+                testCase.debugContext.debugIndex = 4;
 
-                    selenium.doEndsub("");
+                selenium.doEndsub("");
 
-                    areSameArray([5], GosubControl.stack);
-                    Y.Assert.areSame(1, testCase.debugContext.debugIndex);
-                }
+                areSameArray([5], GosubControl.stack);
+                Y.Assert.areSame(1, testCase.debugContext.debugIndex);
 
-                if (true) {
-                    testCase.debugContext.debugIndex = 2;
+                //
+                testCase.debugContext.debugIndex = 2;
 
-                    selenium.doEndsub("");
+                selenium.doEndsub("");
 
-                    areSameArray([], GosubControl.stack);
-                    Y.Assert.areSame(5, testCase.debugContext.debugIndex);
-                }
+                areSameArray([], GosubControl.stack);
+                Y.Assert.areSame(5, testCase.debugContext.debugIndex);
             }
         }));
 

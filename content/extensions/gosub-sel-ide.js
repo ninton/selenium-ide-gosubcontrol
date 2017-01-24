@@ -11,14 +11,13 @@
 function GosubControlClass() {
     "use strict";
 
-    var MyError = function (errnum, message) {
-        var self = new Error(message);
-        self.errnum = errnum;
-        return self;
-    };
+    function MyError (errnum, message) {
+        var err = new Error(message);
+        err.errnum = errnum;
+        return err;
+    }
 
     var self = {};
-
     self.log    = null;
     self.labels = {};
     self.stack  = [];

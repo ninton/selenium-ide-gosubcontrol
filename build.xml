@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="maintainablejs" default="all">
+	<loadproperties srcfile="build.properties" />
+
+	<tstamp>
+		<format property="build.time"
+			    pattern="yyyy-MM-dd hh:mm:ss"
+			    locale="ja,JP" />
+	</tstamp>
+
+	<target name="prop">
+		<echo>Version is ${version}</echo>
+		<echo>src.dir is ${src.dir}</echo>
+		<echo>build.dir is ${build.dir}</echo>
+		<echo>lib.dir is ${lib.dir}</echo>
+		<echo>test.dir is ${test.dir}</echo>
+	</target>
+
+	<target name="version">
+		<echo>${version}</echo>
+	</target>
+
+	
+	<target name="all">
+		<echo message="Project build start."/>
+    	<antcall target="clean"/>
+    	<antcall target="init"/>
+    	<antcall target="jshint"/>
+    	<antcall target="jslint"/>
+    	<antcall target="test"/>
+    	<antcall target="build"/>
+    	<echo message="Project build end."/>
+	</target>
+
+	<target name="clean">
+		<delete file="${app.xpi}"/>
+		<delete dir="${build.dir}"/>
+		<delete dir="${testresult.dir}"/>
+	</target>
+
+	<target name="init">
+		<exec executable="mkdir" failonerror="true">
+			<arg line="--parents" />
+			<arg line="${testresult.dir}" />
+		</exec>
+		<exec executable="mkdir" failonerror="true">
+			<arg line="--parents" />
+			<arg line="${build.dir}/chrome/content" />
+		</exec>
+	</target>
+
+	<target name="jshint">
+		<apply executable="jshint" failonerror="true" parallel="true">
+			<fileset dir="${src.dir}" includes="**/*.js" />
+			<fileset dir="${test.dir}" includes="**/*.js" />
+			<srcfile />
+		</apply>
+	</target>
+
+	<target name="jslint">
+		<apply executable="jslint" failonerror="true" parallel="true">
+			<fileset dir="${src.dir}" includes="**/*.js" />
+			<fileset dir="${test.dir}" includes="**/*.js" />
+			<arg line="--edition es5" />
+			<srcfile />
+		</apply>
+	</target>
+
+	<target name="test">
+		<exec executable="phantomjs" failonerror="true" output="${testresult.dir}/testSeleniumGosub.xml">
+			<arg line="test/phantomMain.js" />
+			<arg line="test/testSeleniumGosub.html" />
+		</exec>
+	</target>
+
+	<target name="build">
+		<copy todir="${build.dir}/chrome/content">
+			<fileset dir="content" />
+		</copy>
+		
+		<copy file="install.rdf" todir="${build.dir}">
+			<filterset>
+				<filter token="VERSION" value="${version}"/>
+			</filterset>
+		</copy>
+
+		<copy file="chrome.manifest.production" tofile="${build.dir}/chrome.manifest" />
+
+		<zip destfile="${app.xpi}">
+			<zipfileset dir="${build.dir}" prefix=""/>
+		</zip>
+	</target>
+</project>
