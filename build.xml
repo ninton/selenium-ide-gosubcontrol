@@ -71,6 +71,12 @@
 			<arg line="test/phantomMain.js" />
 			<arg line="test/testSeleniumGosub.html" />
 		</exec>
+
+		<!--  grep "<failure"  testResults/testSeleniumGosub.xml -->
+		<exec executable="./is_test_passed.sh" failonerror="true">
+			<arg line="${testresult.dir}/testSeleniumGosub.xml"/>
+		</exec>
+
 	</target>
 
 	<target name="build">

@@ -1,7 +1,7 @@
 /*jslint white:true*/
 /*global YUI */
 /*global Selenium, LOG, testCase */
-/*global GosubControl */
+/*global gosubControl */
 
 YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "phantomjs",
     function(Y) {
@@ -60,17 +60,15 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
         };
 
         Y.Test.Runner.add(new Y.Test.Case({
-            name: "echo",
+            name: "testEcho",
             "testEcho": function() {
                 var myLog = new MockLOG();
 
-                GosubControl.setLog(myLog);
-                GosubControl.log.info("Abc");
-                GosubControl.log.info("xYz");
+                gosubControl.init(myLog, testCase);
+                gosubControl.log.info("Abc");
+                gosubControl.log.info("xYz");
 
-                Y.Assert.areSame(2,     myLog.infoMessages.length);
-                Y.Assert.areSame("Abc", myLog.infoMessages[0]);
-                Y.Assert.areSame("xYz", myLog.infoMessages[1]);
+                areSame(["gosubInit", "Abc", "xYz"], myLog.infoMessages);
             }
         }));
 
@@ -91,7 +89,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 testData.forEach(function (data) {
                     testCase.debugContext.debugIndex = data.index;
-                    Y.Assert.areSame(data.expected, GosubControl.getIndex());                    
+                    Y.Assert.areSame(data.expected, gosubControl.getIndex());
                 });
             }
         }));
@@ -115,7 +113,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 testData.forEach(function (data) {
                     testCase.debugContext.debugIndex = data.index;
-                    GosubControl.setIndex(data.setIndex);
+                    gosubControl.setIndex(data.setIndex);
                     Y.Assert.areSame(data.expected, testCase.debugContext.debugIndex);
                 });
 
@@ -159,7 +157,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
                     testCase.debugContext.debugIndex = data.index;
 
                     try {
-                        GosubControl.setIndex(data.setIndex);
+                        gosubControl.setIndex(data.setIndex);
                     } catch (e) {
                         errnum = e.errnum;
                     }
@@ -168,49 +166,6 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
                     Y.Assert.areSame(data.expected.index, testCase.debugContext.debugIndex);
                 });
 
-            }
-        }));
-
-        Y.Test.Runner.add(new Y.Test.Case({
-            name: "testInitOnce",
-            "testInitOnce": function() {
-
-                var testData = [
-                    {
-                        initialized: false,
-                        expected: {
-                            initialized: true,
-                            messages: [
-                                "gosubInit"
-                            ]
-                        }
-                    },
-                    {
-                        initialized: true,
-                        expected: {
-                            initialized: true,
-                            messages: []
-                        }
-                    }
-                ];
-
-                testData.forEach(function(data) {
-                    var selenium = null,
-                        myLog    = null;
-
-                    selenium = new Selenium();
-                    myLog    = new MockLOG();
-
-                    if (data.initialized) {
-                        selenium.gosub_initialized = data.initialized;
-                    }
-
-                    GosubControl.setLog(myLog);
-                    GosubControl.initOnce(selenium);
-
-                    Y.Assert.areSame(true, selenium.gosub_initialized);
-                    areSameArray(data.expected.messages, myLog.infoMessages);
-                });
             }
         }));
 
@@ -267,40 +222,28 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
                 ];
 
                 testData.forEach(function(data) {
-                    var selenium = null,
-                        myLog    = null;
-
-                    selenium = new Selenium();
-                    delete selenium.gosub_initialize;
+                    var myLog    = null;
 
                     myLog = new MockLOG();
-
                     testCase.commands = data.commands;
 
-                    GosubControl.setLog(myLog);
-                    GosubControl.init();
+                    gosubControl.init(myLog, testCase);
 
-                    areSameObject(data.expected.labels, GosubControl.labels);
+                    areSameObject(data.expected.labels, gosubControl.labels);
                     areSameArray(data.expected.messages, myLog.infoMessages);
                 });
             }
         }));
 
         function testInit_Error (data) {
-            var selenium = null,
-                myLog    = null,
+            var myLog    = null,
                 errnum   = "";
 
-            selenium = new Selenium();
-            delete selenium.gosub_initialize;
-
             myLog = new MockLOG();
-
             testCase.commands = data.commands;
 
             try {
-                GosubControl.setLog(myLog);
-                GosubControl.init();
+                gosubControl.init(myLog, testCase);
             } catch (e) {
                 errnum = e.errnum;
             }
@@ -449,8 +392,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
             name: "testRun_Normal",
             "testRun_Normal": function() {
                 var data     = {},
-                    selenium = null,
-                    myLog    = null;
+                    selenium = null;
 
                 data = {
                     commands: [
@@ -462,22 +404,16 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
                 };
 
                 selenium = new Selenium();
-                delete selenium.gosub_initialize;
-
-                myLog = new MockLOG();
-
                 testCase.commands = data.commands;
-
-                GosubControl.setLog(myLog);
 
                 //
                 testCase.debugContext.debugIndex = 0;
 
                 selenium.doGosub("mysub1");
 
-                Y.Assert.areSame(2, GosubControl.labels.mysub1.sub);
-                Y.Assert.areSame(3, GosubControl.labels.mysub1.end);
-                areSameArray([0], GosubControl.stack);
+                Y.Assert.areSame(2, gosubControl.labels.mysub1.sub);
+                Y.Assert.areSame(3, gosubControl.labels.mysub1.end);
+                areSameArray([0], gosubControl.stack);
 
                 Y.Assert.areSame(1, testCase.debugContext.debugIndex);
 
@@ -486,7 +422,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 selenium.doSub("mysub1");
 
-                areSameArray([0], GosubControl.stack);
+                areSameArray([0], gosubControl.stack);
                 Y.Assert.areSame(2, testCase.debugContext.debugIndex);
 
                 //
@@ -494,7 +430,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 selenium.doEndsub("");
 
-                areSameArray([], GosubControl.stack);
+                areSameArray([], gosubControl.stack);
                 Y.Assert.areSame(0, testCase.debugContext.debugIndex);
             }
         }));
@@ -517,8 +453,6 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
                 };
 
                 selenium = new Selenium();
-                delete selenium.gosub_initialize;
-
                 testCase.commands = data.commands;
 
                 //
@@ -526,11 +460,11 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 selenium.doSub("mysub1");
 
-                Y.Assert.areSame(0, GosubControl.labels.mysub1.sub);
-                Y.Assert.areSame(2, GosubControl.labels.mysub1.end);
-                Y.Assert.areSame(3, GosubControl.labels.mysub2.sub);
-                Y.Assert.areSame(4, GosubControl.labels.mysub2.end);
-                areSameArray([], GosubControl.stack);
+                Y.Assert.areSame(0, gosubControl.labels.mysub1.sub);
+                Y.Assert.areSame(2, gosubControl.labels.mysub1.end);
+                Y.Assert.areSame(3, gosubControl.labels.mysub2.sub);
+                Y.Assert.areSame(4, gosubControl.labels.mysub2.end);
+                areSameArray([], gosubControl.stack);
 
                 Y.Assert.areSame(1, testCase.debugContext.debugIndex);
 
@@ -539,7 +473,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 selenium.doEndsub("mysub1");
 
-                areSameArray([], GosubControl.stack);
+                areSameArray([], gosubControl.stack);
                 Y.Assert.areSame(2, testCase.debugContext.debugIndex);
 
                 //
@@ -547,7 +481,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 selenium.doSub("mysub2");
 
-                areSameArray([], GosubControl.stack);
+                areSameArray([], gosubControl.stack);
                 Y.Assert.areSame(3, testCase.debugContext.debugIndex);
 
                 //
@@ -555,7 +489,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 selenium.doEndsub("");
 
-                areSameArray([], GosubControl.stack);
+                areSameArray([], gosubControl.stack);
                 Y.Assert.areSame(4, testCase.debugContext.debugIndex);
 
                 //
@@ -563,7 +497,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 selenium.doGosub("mysub1");
 
-                areSameArray([5], GosubControl.stack);
+                areSameArray([5], gosubControl.stack);
                 Y.Assert.areSame(-1, testCase.debugContext.debugIndex);
 
                 //
@@ -571,7 +505,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 selenium.doSub("mysub1");
 
-                areSameArray([5], GosubControl.stack);
+                areSameArray([5], gosubControl.stack);
                 Y.Assert.areSame(0, testCase.debugContext.debugIndex);
 
                 //
@@ -579,7 +513,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 selenium.doGosub("mysub2");
 
-                areSameArray([5,1], GosubControl.stack);
+                areSameArray([5,1], gosubControl.stack);
                 Y.Assert.areSame(2, testCase.debugContext.debugIndex);
 
                 //
@@ -587,7 +521,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 selenium.doSub("mysub1");
 
-                areSameArray([5,1], GosubControl.stack);
+                areSameArray([5,1], gosubControl.stack);
                 Y.Assert.areSame(3, testCase.debugContext.debugIndex);
 
                 //
@@ -595,7 +529,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 selenium.doEndsub("");
 
-                areSameArray([5], GosubControl.stack);
+                areSameArray([5], gosubControl.stack);
                 Y.Assert.areSame(1, testCase.debugContext.debugIndex);
 
                 //
@@ -603,7 +537,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 selenium.doEndsub("");
 
-                areSameArray([], GosubControl.stack);
+                areSameArray([], gosubControl.stack);
                 Y.Assert.areSame(5, testCase.debugContext.debugIndex);
             }
         }));
@@ -625,8 +559,6 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
                 };
 
                 selenium = new Selenium();
-                delete selenium.gosub_initialize;
-
                 testCase.commands = data.commands;
 
                 try {

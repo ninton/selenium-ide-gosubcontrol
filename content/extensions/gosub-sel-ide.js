@@ -18,25 +18,16 @@ function GosubControlClass() {
     }
 
     var self = {};
-    self.log    = null;
-    self.labels = {};
-    self.stack  = [];
+    self.log      = null;
+    self.testCase = null;
+    self.labels   = {};
+    self.stack    = [];
 
-    self.initOnce = function (io_selenium) {
-        // issue #2: If "Flow Control" is installed, this cannot be initialized correctly
-        // [MEMO] htmlTestRunner.metrics.startTime is undefined.
-        // [MEMO] testCase.lastModifiedTime is same as testCase.file.lastModifiedTime.
-        if (io_selenium.gosub_initialized !== undefined) {
-            return;
-        }
-
-        self.init();
-        io_selenium.gosub_initialized = true;
-    };
-
-    self.init = function () {
+    self.init = function (log, testCase) {
+        self.log = log;
         self.log.info('gosubInit');
 
+        self.testCase = testCase;
         self.labels   = {};
         self.stack    = [];
 
@@ -47,7 +38,7 @@ function GosubControlClass() {
         var lbl = '',
             idx = -1;
 
-        testCase.commands.forEach(function (cmd, i) {
+        self.testCase.commands.forEach(function (cmd, i) {
             if ('command' !== cmd.type) {
                 return;
             }
@@ -82,7 +73,7 @@ function GosubControlClass() {
         });
         
         if (lbl !== '') {
-            self.error('E05', 'There is no "endsub" corresponding to "sub": line=' + testCase.commands.length);
+            self.error('E05', 'There is no "endsub" corresponding to "sub": line=' + self.testCase.commands.length);
         }
     };
 
@@ -124,11 +115,11 @@ function GosubControlClass() {
         if (undefined === i_value || null === i_value || i_value < -1) {
             self.error("E08", "Invalid index: index=" + i_value);
         }
-        testCase.debugContext.debugIndex = i_value;
+        self.testCase.debugContext.debugIndex = i_value;
     };
 
     self.getIndex = function () {
-        return testCase.debugContext.debugIndex;
+        return self.testCase.debugContext.debugIndex;
     };
 
     self.dump = function () {
@@ -171,45 +162,43 @@ function GosubControlClass() {
     return self;
 }
 
-var GosubControl = new GosubControlClass();
+var gosubControl = new GosubControlClass();
 
 
 Selenium.prototype.doGosubInit = function () {
     "use strict";
-    GosubControl.setLog(LOG);
-    GosubControl.init();
+    if (this.gosubController === undefined) {
+        this.gosubController = gosubControl;
+        this.gosubController.init(LOG, testCase);
+    }
 };
 
 Selenium.prototype.doGosubDebug = function () {
     "use strict";
-    GosubControl.setLog(LOG);
-    GosubControl.dump();
+    this.doGosubInit();
+    this.gosubController.dump();
 };
 
-Selenium.prototype.doGosub = function (i_label) {
+Selenium.prototype.doGosub = function (label) {
     "use strict";
-    GosubControl.setLog(LOG);
-    GosubControl.initOnce(this);
-    GosubControl.doGosub(i_label);
+    this.doGosubInit();
+    this.gosubController.doGosub(label);
 };
 
-Selenium.prototype.doSub = function (i_label) {
+Selenium.prototype.doSub = function (label) {
     "use strict";
-    GosubControl.setLog(LOG);
-    GosubControl.initOnce(this);
-    GosubControl.doSub(i_label);
+    this.doGosubInit();
+    this.gosubController.doSub(label);
 };
 
 Selenium.prototype.doEndsub = function () {
     "use strict";
-    GosubControl.setLog(LOG);
-    GosubControl.initOnce(this);
-    GosubControl.doEndsub();
+    this.doGosubInit();
+    this.gosubController.doEndsub();
 };
 
 Selenium.prototype.doReturn = function () {
     "use strict";
-    GosubControl.setLog(LOG);
-    GosubControl.initOnce(this);
-    GosubControl.doEndsub();
+    this.doGosubInit();
+    this.gosubController.doEndsub();
 };
