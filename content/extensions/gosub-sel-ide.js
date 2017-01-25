@@ -20,7 +20,7 @@ function GosubControlClass() {
     var self = {};
     self.log      = null;
     self.testCase = null;
-    self.labels   = {};
+    self.subroutineMap   = {};
     self.stack    = [];
 
     self.init = function (log, testCase) {
@@ -28,7 +28,7 @@ function GosubControlClass() {
         self.log.info('gosubInit');
 
         self.testCase = testCase;
-        self.labels   = {};
+        self.subroutineMap   = {};
         self.stack    = [];
 
         self.initBody();
@@ -49,7 +49,7 @@ function GosubControlClass() {
                         self.error('E01', 'A label of "sub" is a blank: line=' + i);
                     }
 
-                    if (self.labels[cmd.target] !== undefined) {
+                    if (self.subroutineMap[cmd.target] !== undefined) {
                         self.error('E02', 'A label of "sub" appears twice or more: line=' + i);
                     }
 
@@ -65,7 +65,7 @@ function GosubControlClass() {
                     if (lbl === '') {
                         self.error('E04', 'There is no "sub" corresponding to "endsub": line=' + i);
                     }
-                    self.labels[lbl] = {sub: idx, end: i};
+                    self.subroutineMap[lbl] = {sub: idx, end: i};
                     lbl = '';
                     idx = -1;
                     break;
@@ -90,11 +90,11 @@ function GosubControlClass() {
     self.gotoSub = function (i_label) {
         var idx;
 
-        if (undefined === self.labels[i_label]) {
+        if (undefined === self.subroutineMap[i_label]) {
             self.error("E06", '"sub ' + i_label + '" is not found.');
         }
 
-        idx = parseInt(self.labels[i_label].sub, 10) - 1;
+        idx = parseInt(self.subroutineMap[i_label].sub, 10) - 1;
         self.setIndex(idx);
         return idx;
     };
@@ -102,11 +102,11 @@ function GosubControlClass() {
     self.gotoEndsub = function (i_label) {
         var idx;
 
-        if (undefined === self.labels[i_label]) {
+        if (undefined === self.subroutineMap[i_label]) {
             self.error("E07", '"sub ' + i_label + '" is not found.');
         }
 
-        idx = parseInt(self.labels[i_label].end, 10) - 1;
+        idx = parseInt(self.subroutineMap[i_label].end, 10) - 1;
         self.setIndex(idx);
         return idx;
     };
@@ -123,8 +123,8 @@ function GosubControlClass() {
     };
 
     self.dump = function () {
-        Object.keys(self.labels).forEach(function(label) {
-            self.log.info("labels:" + label + "|" + self.labels[label].sub + "|" + self.labels[label].end);
+        Object.keys(self.subroutineMap).forEach(function(label) {
+            self.log.info("labels:" + label + "|" + self.subroutineMap[label].sub + "|" + self.subroutineMap[label].end);
         });
         Object.keys(self.stack).forEach(function(index) {
             self.log.info("stack:" + index);

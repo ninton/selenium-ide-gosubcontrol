@@ -178,7 +178,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
                         commands: [
                         ],
                         expected: {
-                            labels: {
+                            subroutineMap: {
                             },
                             messages: [
                                 "gosubInit"
@@ -192,7 +192,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
                             {type: "command" , command: "verify", target: "x"}
                         ],
                         expected: {
-                            labels: {
+                            subroutineMap: {
                             },
                             messages: [
                                 "gosubInit"
@@ -210,7 +210,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
                             {type: "command" , command: "endsub", target: ""}
                         ],
                         expected: {
-                            labels: {
+                            subroutineMap: {
                                 "mysub1": {sub: 1, end: 3},
                                 "mysub2": {sub: 4, end: 6}
                             },
@@ -229,7 +229,7 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                     gosubControl.init(myLog, testCase);
 
-                    areSameObject(data.expected.labels, gosubControl.labels);
+                    areSameObject(data.expected.subroutineMap, gosubControl.subroutineMap);
                     areSameArray(data.expected.messages, myLog.infoMessages);
                 });
             }
@@ -411,8 +411,8 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 selenium.doGosub("mysub1");
 
-                Y.Assert.areSame(2, gosubControl.labels.mysub1.sub);
-                Y.Assert.areSame(3, gosubControl.labels.mysub1.end);
+                Y.Assert.areSame(2, gosubControl.subroutineMap.mysub1.sub);
+                Y.Assert.areSame(3, gosubControl.subroutineMap.mysub1.end);
                 areSameArray([0], gosubControl.stack);
 
                 Y.Assert.areSame(1, testCase.debugContext.debugIndex);
@@ -460,10 +460,10 @@ YUI({logInclude: {TestRunner: true}}).use("test", "console", "test-console", "ph
 
                 selenium.doSub("mysub1");
 
-                Y.Assert.areSame(0, gosubControl.labels.mysub1.sub);
-                Y.Assert.areSame(2, gosubControl.labels.mysub1.end);
-                Y.Assert.areSame(3, gosubControl.labels.mysub2.sub);
-                Y.Assert.areSame(4, gosubControl.labels.mysub2.end);
+                Y.Assert.areSame(0, gosubControl.subroutineMap.mysub1.sub);
+                Y.Assert.areSame(2, gosubControl.subroutineMap.mysub1.end);
+                Y.Assert.areSame(3, gosubControl.subroutineMap.mysub2.sub);
+                Y.Assert.areSame(4, gosubControl.subroutineMap.mysub2.end);
                 areSameArray([], gosubControl.stack);
 
                 Y.Assert.areSame(1, testCase.debugContext.debugIndex);
