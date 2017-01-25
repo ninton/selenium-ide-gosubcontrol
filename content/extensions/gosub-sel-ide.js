@@ -11,156 +11,160 @@
 function GosubControlClass() {
     "use strict";
 
-    function MyError (errnum, message) {
-        var err = new Error(message);
-        err.errnum = errnum;
-        return err;
+    this.log           = null;
+    this.testCase      = testCase;
+    this.subroutineMap = {};
+    this.stack         = [];
+}
+
+GosubControlClass.prototype.init = function (log, testCase) {
+    "use strict";
+    this.log      = log;
+    this.testCase = testCase;
+    this.log.info('gosubInit');
+
+    this.subroutineMap = {};
+    this.stack         = [];
+
+    this.makeSubroutineMap();
+};
+
+GosubControlClass.prototype.makeSubroutineMap = function () {
+    "use strict";
+    var lbl = '',
+        idx = -1,
+        self = this;
+
+    this.testCase.commands.forEach(function (cmd, i) {
+        if ('command' !== cmd.type) {
+            return;
+        }
+
+        switch (cmd.command.toLowerCase()) {
+            case "sub":
+                if (cmd.target === undefined || cmd.target === '') {
+                    self.error('E01', 'A label of "sub" is a blank: line=' + i);
+                }
+
+                if (self.subroutineMap[cmd.target] !== undefined) {
+                    self.error('E02', 'A label of "sub" appears twice or more: line=' + i);
+                }
+
+                if (lbl !== '') {
+                    self.error('E03', 'There is no "endsub" corresponding to "sub": line=' + i);
+                }
+
+                lbl = cmd.target;
+                idx = i;
+                break;
+
+            case "endsub":
+                if (lbl === '') {
+                    self.error('E04', 'There is no "sub" corresponding to "endsub": line=' + i);
+                }
+                self.subroutineMap[lbl] = {sub: idx, end: i};
+                lbl = '';
+                idx = -1;
+                break;
+        }
+    });
+
+    if (lbl !== '') {
+        this.error('E05', 'There is no "endsub" corresponding to "sub": line=' + self.testCase.commands.length);
+    }
+};
+
+GosubControlClass.prototype.error = function (errnum, mesg) {
+    "use strict";
+    this.dump();
+
+    var err = new Error(mesg);
+    err.errnum = errnum;
+
+    throw err;
+};
+
+GosubControlClass.prototype.gotoSub = function (i_label) {
+    "use strict";
+    var idx;
+
+    if (undefined === this.subroutineMap[i_label]) {
+        this.error("E06", '"sub ' + i_label + '" is not found.');
     }
 
-    var self = {};
-    self.log      = null;
-    self.testCase = null;
-    self.subroutineMap   = {};
-    self.stack    = [];
+    idx = parseInt(this.subroutineMap[i_label].sub, 10) - 1;
+    this.setIndex(idx);
+    return idx;
+};
 
-    self.init = function (log, testCase) {
-        self.log = log;
-        self.log.info('gosubInit');
+GosubControlClass.prototype.gotoEndsub = function (i_label) {
+    "use strict";
+    var idx;
 
-        self.testCase = testCase;
-        self.subroutineMap   = {};
-        self.stack    = [];
+    if (undefined === this.subroutineMap[i_label]) {
+        this.error("E07", '"sub ' + i_label + '" is not found.');
+    }
 
-        self.initBody();
-    };
+    idx = parseInt(this.subroutineMap[i_label].end, 10) - 1;
+    this.setIndex(idx);
+    return idx;
+};
 
-    self.initBody = function () {
-        var lbl = '',
-            idx = -1;
+GosubControlClass.prototype.setIndex = function (i_value) {
+    "use strict";
+    if (undefined === i_value || null === i_value || i_value < -1) {
+        this.error("E08", "Invalid index: index=" + i_value);
+    }
+    this.testCase.debugContext.debugIndex = i_value;
+};
 
-        self.testCase.commands.forEach(function (cmd, i) {
-            if ('command' !== cmd.type) {
-                return;
-            }
+GosubControlClass.prototype.getIndex = function () {
+    "use strict";
+    return this.testCase.debugContext.debugIndex;
+};
 
-            switch (cmd.command.toLowerCase()) {
-                case "sub":
-                    if (cmd.target === undefined || cmd.target === '') {
-                        self.error('E01', 'A label of "sub" is a blank: line=' + i);
-                    }
+GosubControlClass.prototype.dump = function () {
+    "use strict";
+    var self = this;
 
-                    if (self.subroutineMap[cmd.target] !== undefined) {
-                        self.error('E02', 'A label of "sub" appears twice or more: line=' + i);
-                    }
+    Object.keys(this.subroutineMap).forEach(function(label) {
+        self.log.info("labels:" + label + "|" + self.subroutineMap[label].sub + "|" + self.subroutineMap[label].end);
+    });
+    Object.keys(this.stack).forEach(function(index) {
+        self.log.info("stack:" + index);
+    });
+};
 
-                    if (lbl !== '') {
-                        self.error('E03', 'There is no "endsub" corresponding to "sub": line=' + i);
-                    }
+GosubControlClass.prototype.doGosub = function (i_label) {
+    "use strict";
+    this.stack.push(this.getIndex());
+    this.gotoSub(i_label);
+};
 
-                    lbl = cmd.target;
-                    idx = i;
-                    break;
+GosubControlClass.prototype.doSub = function (i_label) {
+    "use strict";
+    var idx;
 
-                case "endsub":
-                    if (lbl === '') {
-                        self.error('E04', 'There is no "sub" corresponding to "endsub": line=' + i);
-                    }
-                    self.subroutineMap[lbl] = {sub: idx, end: i};
-                    lbl = '';
-                    idx = -1;
-                    break;
-            }
-        });
-        
-        if (lbl !== '') {
-            self.error('E05', 'There is no "endsub" corresponding to "sub": line=' + self.testCase.commands.length);
-        }
-    };
+    if (0 === this.stack.length) {
+        idx = this.gotoEndsub(i_label);
+        this.log.info("sub : fall down, skip to line=" +  idx);
+    } else {
+        this.log.info("sub : from gosub");
+    }
+};
 
-    self.setLog = function (log) {
-        self.log = log;
-    };
+GosubControlClass.prototype.doEndsub = function () {
+    "use strict";
+    var idx;
 
-    self.error = function (errnum, mesg) {
-        self.dump();
-
-        throw new MyError(errnum, mesg);
-    };
-
-    self.gotoSub = function (i_label) {
-        var idx;
-
-        if (undefined === self.subroutineMap[i_label]) {
-            self.error("E06", '"sub ' + i_label + '" is not found.');
-        }
-
-        idx = parseInt(self.subroutineMap[i_label].sub, 10) - 1;
-        self.setIndex(idx);
-        return idx;
-    };
-
-    self.gotoEndsub = function (i_label) {
-        var idx;
-
-        if (undefined === self.subroutineMap[i_label]) {
-            self.error("E07", '"sub ' + i_label + '" is not found.');
-        }
-
-        idx = parseInt(self.subroutineMap[i_label].end, 10) - 1;
-        self.setIndex(idx);
-        return idx;
-    };
-
-    self.setIndex = function (i_value) {
-        if (undefined === i_value || null === i_value || i_value < -1) {
-            self.error("E08", "Invalid index: index=" + i_value);
-        }
-        self.testCase.debugContext.debugIndex = i_value;
-    };
-
-    self.getIndex = function () {
-        return self.testCase.debugContext.debugIndex;
-    };
-
-    self.dump = function () {
-        Object.keys(self.subroutineMap).forEach(function(label) {
-            self.log.info("labels:" + label + "|" + self.subroutineMap[label].sub + "|" + self.subroutineMap[label].end);
-        });
-        Object.keys(self.stack).forEach(function(index) {
-            self.log.info("stack:" + index);
-        });
-    };
-
-    self.doGosub = function (i_label) {
-        self.stack.push(self.getIndex());
-        self.gotoSub(i_label);
-    };
-
-    self.doSub = function (i_label) {
-        var idx;
-
-        if (0 === self.stack.length) {
-            idx = self.gotoEndsub(i_label);
-            self.log.info("sub : fall down, skip to line=" +  idx);
-        } else {
-            self.log.info("sub : from gosub");
-        }
-    };
-
-    self.doEndsub = function () {
-        var idx;
-
-        if (0 === self.stack.length) {
-            self.log.info("endsub : fall down");
-        } else {
-            idx = self.stack.pop();
-            self.log.info("endsub : goto line=" + idx);
-            self.setIndex(idx);
-        }
-    };
-
-    return self;
-}
+    if (0 === this.stack.length) {
+        this.log.info("endsub : fall down");
+    } else {
+        idx = this.stack.pop();
+        this.log.info("endsub : goto line=" + idx);
+        this.setIndex(idx);
+    }
+};
 
 var gosubControl = new GosubControlClass();
 
