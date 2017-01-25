@@ -4,3 +4,4 @@
 /content/extensions/*.bak
 .project
 .settings
+testResults
