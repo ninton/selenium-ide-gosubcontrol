@@ -31,9 +31,13 @@ GosubControlClass.prototype.init = function (log, testCase) {
 
 GosubControlClass.prototype.makeSubroutineMap = function () {
     "use strict";
-    var lbl = '',
-        idx = -1,
-        self = this;
+    var self = this,
+        params;
+
+    params = {
+        lbl: "",
+        idx: -1
+    };
 
     this.testCase.commands.forEach(function (cmd, i) {
         if ('command' !== cmd.type) {
@@ -42,45 +46,56 @@ GosubControlClass.prototype.makeSubroutineMap = function () {
 
         switch (cmd.command.toLowerCase()) {
             case "sub":
-                if (cmd.target === undefined || cmd.target === '') {
-                    self.error('E01', 'A label of "sub" is a blank: line=' + i);
-                }
-
-                if (self.subroutineMap[cmd.target] !== undefined) {
-                    self.error('E02', 'A label of "sub" appears twice or more: line=' + i);
-                }
-
-                if (lbl !== '') {
-                    self.error('E03', 'There is no "endsub" corresponding to "sub": line=' + i);
-                }
-
-                lbl = cmd.target;
-                idx = i;
+                self.makeSub(params, i, cmd);
                 break;
 
             case "endsub":
-                if (lbl === '') {
-                    self.error('E04', 'There is no "sub" corresponding to "endsub": line=' + i);
-                }
-                self.subroutineMap[lbl] = {sub: idx, end: i};
-                lbl = '';
-                idx = -1;
+                self.makeEndsub(params, i);
                 break;
         }
     });
 
-    if (lbl !== '') {
+    if (params.lbl !== '') {
         this.error('E05', 'There is no "endsub" corresponding to "sub": line=' + self.testCase.commands.length);
     }
 };
 
+GosubControlClass.prototype.makeSub = function (params, i, cmd) {
+    "use strict";
+    if (cmd.target === undefined || cmd.target === '') {
+        this.error('E01', 'A label of "sub" is a blank: line=' + i);
+    }
+
+    if (this.subroutineMap[cmd.target] !== undefined) {
+        this.error('E02', 'A label of "sub" appears twice or more: line=' + i);
+    }
+
+    if (params.lbl !== '') {
+        this.error('E03', 'There is no "endsub" corresponding to "sub": line=' + i);
+    }
+
+    params.lbl = cmd.target;
+    params.idx = i;
+};
+
+GosubControlClass.prototype.makeEndsub = function (params, i) {
+    "use strict";
+    if (params.lbl === '') {
+        this.error('E04', 'There is no "sub" corresponding to "endsub": line=' + i);
+    }
+    this.subroutineMap[params.lbl] = {sub: params.idx, end: i};
+    params.lbl = '';
+    params.idx = -1;
+};
+
 GosubControlClass.prototype.error = function (errnum, mesg) {
     "use strict";
+    var err;
+
     this.dump();
 
-    var err = new Error(mesg);
+    err = new Error(mesg);
     err.errnum = errnum;
-
     throw err;
 };
 
@@ -166,11 +181,14 @@ GosubControlClass.prototype.doEndsub = function () {
     }
 };
 
-var gosubControl = new GosubControlClass();
+var gosubControl;
 
 
 Selenium.prototype.doGosubInit = function () {
     "use strict";
+    if (gosubControl === undefined) {
+        gosubControl = new GosubControlClass();
+    }
     if (this.gosubController === undefined) {
         this.gosubController = gosubControl;
         this.gosubController.init(LOG, testCase);

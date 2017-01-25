@@ -4,7 +4,7 @@
 
 	<tstamp>
 		<format property="build.time"
-			    pattern="yyyy-MM-dd hh:mm:ss"
+			    pattern="yyyy-MM-dd-hh-mm-ss"
 			    locale="ja,JP" />
 	</tstamp>
 
@@ -14,6 +14,7 @@
 		<echo>build.dir is ${build.dir}</echo>
 		<echo>lib.dir is ${lib.dir}</echo>
 		<echo>test.dir is ${test.dir}</echo>
+		<echo>build.time is ${build.time}</echo>
 	</target>
 
 	<target name="version">
@@ -23,6 +24,7 @@
 	
 	<target name="all">
 		<echo message="Project build start."/>
+    	<antcall target="prop"/>
     	<antcall target="clean"/>
     	<antcall target="init"/>
     	<antcall target="jshint"/>
@@ -33,7 +35,6 @@
 	</target>
 
 	<target name="clean">
-		<delete file="${app.xpi}"/>
 		<delete dir="${build.dir}"/>
 		<delete dir="${testresult.dir}"/>
 	</target>
@@ -86,13 +87,13 @@
 		
 		<copy file="install.rdf" todir="${build.dir}">
 			<filterset>
-				<filter token="VERSION" value="${version}"/>
+				<filter token="VERSION" value="${version}.${build.time}"/>
 			</filterset>
 		</copy>
 
 		<copy file="chrome.manifest.production" tofile="${build.dir}/chrome.manifest" />
 
-		<zip destfile="${app.xpi}">
+		<zip destfile="${app.name}_${version}_${build.time}.xpi">
 			<zipfileset dir="${build.dir}" prefix=""/>
 		</zip>
 	</target>
