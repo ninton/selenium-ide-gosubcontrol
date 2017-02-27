@@ -29,7 +29,8 @@
     	<antcall target="init"/>
     	<antcall target="jshint"/>
     	<antcall target="jslint"/>
-    	<antcall target="test"/>
+    	<antcall target="jsmeter"/>
+    	<antcall target="jstest"/>
     	<antcall target="build"/>
     	<echo message="Project build end."/>
 	</target>
@@ -51,7 +52,7 @@
 	</target>
 
 	<target name="jshint">
-		<apply executable="jshint" failonerror="true" parallel="true">
+		<apply executable="./ant_utils/jshint.sh" failonerror="true">
 			<fileset dir="${src.dir}" includes="**/*.js" />
 			<fileset dir="${test.dir}" includes="**/*.js" />
 			<srcfile />
@@ -59,7 +60,7 @@
 	</target>
 
 	<target name="jslint">
-		<apply executable="jslint" failonerror="true" parallel="true">
+		<apply executable="jslint" failonerror="true">
 			<fileset dir="${src.dir}" includes="**/*.js" />
 			<fileset dir="${test.dir}" includes="**/*.js" />
 			<arg line="--edition es5" />
@@ -67,14 +68,24 @@
 		</apply>
 	</target>
 
-	<target name="test">
-		<exec executable="phantomjs" failonerror="true" output="${testresult.dir}/testSeleniumGosub.xml">
-			<arg line="test/phantomMain.js" />
-			<arg line="test/testSeleniumGosub.html" />
-		</exec>
+	<target name="jsmeter">
+		<apply executable="./ant_utils/jsmeter.sh" failonerror="true" dest="jsmeter/content/extensions">
+			<mapper type="glob" from="*.js" to="*.json"/>
+			<fileset dir="${src.dir}" includes="**/*.js"  excludes="**phantom**.js"/>
+			<srcfile/>
+			<targetfile/>
+		</apply>
+	</target>
+
+	<target name="jstest">
+		<apply executable="./ant_utils/js_test.sh" failonerror="true">
+			<fileset dir="${test.dir}" includes="**/*.html"/>
+			<arg line="${testresult.dir}"/>
+			<srcfile />
+		</apply>
 
 		<!--  grep "<failure"  testResults/testSeleniumGosub.xml -->
-		<exec executable="./is_test_passed.sh" failonerror="true">
+		<exec executable="./ant_utils/is_test_passed.sh" failonerror="true">
 			<arg line="${testresult.dir}/testSeleniumGosub.xml"/>
 		</exec>
 

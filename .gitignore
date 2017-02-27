@@ -2,6 +2,7 @@
 /*.xpi
 /build
 /content/extensions/*.bak
+/jsmeter
 .project
 .settings
 testResults
